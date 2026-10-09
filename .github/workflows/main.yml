@@ -1,13 +1,47 @@
 
-      - name: Find and extract project ZIP
+name: Build CatatUang APK
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: "8.9"
+
+      - name: Locate and extract ZIP
         run: |
-          echo "Checking repository files..."
-          find . -maxdepth 3 -type f -print
-          ZIP_FILE="$(find . -maxdepth 3 -type f -iname 'CatatUangAndroid_HP_BuildAPK.zip' -print -quit)"
+          echo "Repository files:"
+          find . -maxdepth 4 -type f -print
+          ZIP_FILE="$(find . -type f -name 'CatatUangAndroid_HP_BuildAPK.zip' -print -quit)"
           if [ -z "$ZIP_FILE" ]; then
-            echo "ZIP file not found. Searching all ZIP files:"
-            find . -type f -iname '*.zip' -print
+            echo "ZIP tidak ditemukan di repository."
             exit 1
           fi
-          echo "Extracting: $ZIP_FILE"
+          echo "ZIP ditemukan: $ZIP_FILE"
           unzip -o "$ZIP_FILE" -d .
+
+      - name: Build debug APK
+        run: gradle -p CatatUangAndroid assembleDebug
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: CatatUang-APK
+          path: CatatUangAndroid/app/build/outputs/apk/debug/app-debug.apk
