@@ -27,11 +27,11 @@ jobs:
 
       - name: Locate and extract ZIP
         run: |
-          echo "Repository files:"
+          echo "Daftar file repository:"
           find . -maxdepth 4 -type f -print
-          ZIP_FILE="$(find . -type f -name 'CatatUangAndroid_HP_BuildAPK.zip' -print -quit)"
+          ZIP_FILE="$(find . -type f -iname '*CatatUangAndroid*BuildAPK*.zip' -print -quit)"
           if [ -z "$ZIP_FILE" ]; then
-            echo "ZIP tidak ditemukan di repository."
+            echo "ZIP tidak ditemukan. Periksa file ZIP di repository."
             exit 1
           fi
           echo "ZIP ditemukan: $ZIP_FILE"
